@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="author" content="Dwi Rosnita, S.Pd., Gr.">
+<title>Asesmen Battle – Adaptasi & Mitigasi Iklim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0b2545;--navy2:#13315c;--blue:#1f6fb2;--sky:#e8f3fc;
+  --teal:#0e9f9a;--green:#2f9e44;--orange:#f08c00;--red:#e03131;--yellow:#fcc419;
+  --ink:#14253a;--muted:#4a5d73;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:#06172d;font-family:'Poppins','Segoe UI',system-ui,sans-serif;color:var(--ink);user-select:none;-webkit-user-select:none;touch-action:none}
+button{font-family:inherit;cursor:pointer}
+a{text-decoration:none}
+
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform-origin:50% 50%;overflow:hidden;
+  background:radial-gradient(900px 500px at 85% -5%,rgba(255,255,255,.9),transparent 60%),linear-gradient(180deg,#eaf5fd 0%,#cfe5f6 100%)}
+
+@keyframes rise{from{opacity:0;transform:translateY(34px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+@keyframes pulse{50%{transform:scale(1.05)}}
+@keyframes shake{20%,60%{transform:translateX(-10px)}40%,80%{transform:translateX(10px)}}
+@keyframes bob{50%{transform:translateY(-10px)}}
+
+.btn{border:none;border-radius:20px;padding:16px 30px;font-weight:700;font-size:24px;color:#fff;background:var(--blue);box-shadow:0 6px 0 rgba(0,0,0,.25);transition:transform .12s;display:inline-flex;align-items:center;gap:10px}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.card{background:#fff;border-radius:28px;box-shadow:0 10px 26px rgba(11,37,69,.13)}
+
+/* ===== TOP BAR ===== */
+#top{position:absolute;left:0;top:0;width:1600px;height:76px;background:var(--navy);display:flex;align-items:center;gap:10px;padding:0 16px;z-index:40;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.tb{height:56px;min-width:58px;padding:0 16px;border:none;border-radius:16px;background:#1d3d66;color:#fff;font-weight:600;font-size:20px;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .12s,background .2s}
+.tb:active{transform:scale(.9)}
+.tb .e{font-size:24px}
+.tb.on{background:var(--teal)}
+.tb.warn{background:#c92a2a}
+#ttl{flex:1;color:#fff;font-size:21px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ttl small{color:#8fb7df;font-weight:500;margin-left:10px;font-size:17px}
+.gameOnly{display:none!important}
+body.playing .gameOnly{display:flex!important}
+
+.screen{position:absolute;left:0;top:0;width:1600px;height:900px;display:none}
+.screen.show{display:block}
+
+/* ===== SETUP ===== */
+#setup{padding:92px 54px 16px}
+.sethead{display:flex;align-items:center;gap:22px;margin-bottom:14px;animation:rise .6s both}
+.sethead .ic{width:80px;height:80px;border-radius:28px;background:linear-gradient(135deg,#5f3dc4,#1971c2);display:grid;place-items:center;font-size:54px;box-shadow:0 8px 0 #2b1d6b;animation:bob 2.4s ease-in-out infinite}
+.sethead h1{font-size:46px;color:var(--navy);line-height:1.05;font-weight:800}
+.sethead p{font-size:22px;color:var(--muted);font-weight:500}
+.setgrid{display:flex;gap:26px}
+.setc{width:860px;padding:26px 32px;animation:rise .6s both .1s}
+.setc h3,.howc h3{font-size:28px;color:var(--navy);margin-bottom:12px}
+.row{padding:9px 0;border-top:2px dashed #dbe7f3}
+.row:first-of-type{border-top:none}
+.row label{display:block;font-size:21px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.seg{display:flex;gap:12px}
+.seg button{flex:1;height:66px;border-radius:20px;border:4px solid #cfe0f0;background:var(--sky);font-weight:800;font-size:26px;color:var(--navy);transition:transform .12s,background .2s,border-color .2s}
+.seg button small{display:block;font-size:15px;font-weight:600;opacity:.75;line-height:1}
+.seg button:active{transform:scale(.95)}
+.seg button.on{background:var(--navy);border-color:var(--navy);color:#fff;box-shadow:0 6px 0 #04142a;transform:translateY(-3px)}
+#summary{margin-top:12px;font-size:20px;color:var(--muted);font-weight:600;background:#fff9db;border-radius:16px;padding:10px 18px}
+.howc{flex:1;padding:26px 30px;animation:rise .6s both .2s;display:flex;flex-direction:column}
+.howc ol{list-style:none;counter-reset:s}
+.howc li{counter-increment:s;display:flex;gap:14px;align-items:flex-start;font-size:20px;line-height:1.4;margin-bottom:12px}
+.howc li::before{content:counter(s);flex:none;width:38px;height:38px;border-radius:12px;background:var(--teal);color:#fff;font-weight:800;display:grid;place-items:center;font-size:19px}
+#prevBk{display:flex;gap:12px;margin-top:auto;justify-content:center}
+#prevBk span{flex:1;max-width:150px;text-align:center;border-radius:16px 16px 34px 34px;padding:12px 6px 10px;color:#fff;font-weight:800;font-size:17px;background:var(--g);animation:pop .4s cubic-bezier(.3,1.6,.5,1) both;box-shadow:0 5px 0 rgba(0,0,0,.2)}
+#prevBk span b{display:block;font-size:34px;line-height:1.1}
+.startRow{display:flex;justify-content:center;margin-top:18px;animation:rise .6s both .3s}
+#btnStart{font-size:32px;padding:18px 70px;border-radius:28px;background:linear-gradient(90deg,#f08c00,#e8590c);box-shadow:0 9px 0 #a3480a;animation:pulse 2s ease-in-out 1s infinite}
+
+/* ===== GAME ===== */
+#qbox{position:absolute;left:40px;right:40px;top:90px;height:150px;display:flex;align-items:center;gap:24px;padding:18px 26px;z-index:8}
+#qno{flex:none;width:104px;height:104px;border-radius:28px;background:var(--navy);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:42px;font-weight:800;line-height:1}
+#qno small{font-size:15px;font-weight:600;opacity:.75;margin-top:4px}
+#qtext{flex:1;font-size:29px;font-weight:700;color:var(--navy);line-height:1.35}
+#qtext.in{animation:rise .5s both}
+#timer{flex:none;width:112px;height:112px;position:relative}
+#timer svg{width:112px;height:112px;transform:rotate(-90deg)}
+#tnum{position:absolute;left:0;top:0;width:112px;height:112px;display:grid;place-items:center;font-size:40px;font-weight:800;color:var(--navy)}
+#timer.hurry #tnum{color:var(--red);animation:pulse .5s infinite}
+#orbit{position:absolute;left:330px;top:315px;width:940px;height:250px;border-radius:50%;border:4px dashed rgba(19,49,92,.18);z-index:1}
+#hint{position:absolute;left:0;right:0;top:428px;text-align:center;font-size:20px;font-weight:700;color:rgba(19,49,92,.35);z-index:1}
+
+.opt{position:absolute;left:0;top:0;width:360px;height:110px;z-index:6;touch-action:none;cursor:grab;will-change:transform}
+.opt .oc{width:100%;height:100%;display:flex;align-items:center;gap:14px;padding:8px 16px 8px 10px;background:#fff;border-radius:26px;border:5px solid var(--oc);box-shadow:0 10px 24px rgba(11,37,69,.25);font-weight:700;font-size:21px;line-height:1.25;color:var(--ink);transition:transform .35s cubic-bezier(.3,1.4,.5,1),opacity .4s,background .3s,border-color .3s;animation:pop .5s cubic-bezier(.3,1.5,.5,1) backwards}
+.opt .L{flex:none;width:64px;height:64px;border-radius:50%;background:var(--oc);color:#fff;font-size:34px;font-weight:800;display:grid;place-items:center}
+.opt.drag{z-index:20;cursor:grabbing}
+.opt.drag .oc{transform:scale(1.08);box-shadow:0 24px 44px rgba(11,37,69,.4)}
+.opt.bad .oc{background:#ffe3e3;border-color:var(--red);animation:shake .4s}
+.opt.right .oc{background:#d3f9d8;border-color:var(--green);transform:scale(1.12)}
+.opt.right .L{background:var(--green)}
+.opt.dim .oc{opacity:.3}
+.opt.into .oc{transform:scale(.15);opacity:0;transition:transform .6s ease-in,opacity .6s ease-in}
+
+#baskets{position:absolute;left:0;right:0;bottom:10px;height:250px;display:flex;justify-content:space-evenly;align-items:flex-end;z-index:5}
+.basket{position:relative;height:236px;transition:transform .2s}
+.bk-body{position:absolute;left:0;right:0;top:56px;bottom:0;clip-path:polygon(0 0,100% 0,88% 100%,12% 100%);
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.17) 0 16px,transparent 16px 32px),repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0 14px,transparent 14px 28px),var(--g);transition:filter .3s}
+.bk-mouth{position:absolute;left:-3%;width:106%;top:30px;height:54px;border-radius:50%;background:radial-gradient(ellipse at 50% 65%,#151515,#3d3d3d);border:10px solid var(--gd);transition:box-shadow .2s}
+.bk-score{position:absolute;left:0;right:0;top:16px;text-align:center;font-size:96px;font-weight:800;color:#fff;text-shadow:0 5px 0 rgba(0,0,0,.3);line-height:1}
+.bk-score.bump{animation:pop .5s cubic-bezier(.3,1.8,.5,1)}
+.bk-name{position:absolute;left:15%;right:15%;bottom:14px;text-align:center;color:#fff;font-weight:800;font-size:21px;background:rgba(0,0,0,.28);border-radius:30px;padding:4px 0;white-space:nowrap}
+.lid{position:absolute;left:-6%;width:112%;top:16px;height:54px;border-radius:50%;background:radial-gradient(ellipse at 50% 30%,var(--g),var(--gd));border:4px solid var(--gd);opacity:0;transform:translateY(-130px) rotate(-16deg);transition:transform .5s cubic-bezier(.5,1.7,.5,1),opacity .25s;z-index:3;pointer-events:none}
+.lid i{position:absolute;left:50%;top:-16px;width:64px;height:24px;margin-left:-32px;border-radius:14px 14px 4px 4px;background:var(--gd)}
+.basket.closed .lid{opacity:1;transform:none}
+.basket.closed .bk-body{filter:grayscale(.75) brightness(.7)}
+.lock{position:absolute;left:50%;top:-34px;transform:translateX(-50%) scale(0);background:#fff;color:#c92a2a;font-weight:800;font-size:21px;padding:5px 16px;border-radius:20px;white-space:nowrap;z-index:4;transition:transform .35s cubic-bezier(.3,1.6,.5,1);box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.basket.closed .lock{transform:translateX(-50%) scale(1)}
+.basket.over{transform:translateY(-12px) scale(1.04)}
+.basket.over .bk-mouth{box-shadow:0 0 0 8px #ffd43b,0 0 34px #ffd43b}
+.basket.shake{animation:shake .4s}
+.plus{position:absolute;left:50%;top:0;font-size:64px;font-weight:800;color:#ffd43b;-webkit-text-stroke:3px #0b2545;opacity:0;z-index:6;pointer-events:none}
+.basket.got .plus{animation:plus 1.3s ease-out}
+@keyframes plus{0%{opacity:0;transform:translate(-50%,20px) scale(.5)}25%{opacity:1;transform:translate(-50%,-40px) scale(1.25)}100%{opacity:0;transform:translate(-50%,-130px) scale(1)}}
+
+#banner{position:absolute;left:50%;top:360px;width:960px;margin-left:-480px;z-index:25;border-radius:30px;padding:22px 30px;display:flex;align-items:center;gap:22px;color:#fff;box-shadow:0 18px 40px rgba(0,0,0,.3);transform:scale(0);opacity:0;transition:transform .45s cubic-bezier(.3,1.5,.5,1),opacity .3s;pointer-events:none}
+#banner.show{transform:scale(1);opacity:1;pointer-events:auto}
+#banner .be{font-size:70px;line-height:1}
+#banner .bt{flex:1}
+#banner .bt b{display:block;font-size:34px;line-height:1.15}
+#banner .bt span{font-size:21px;opacity:.95}
+#banner button{flex:none;border:none;border-radius:18px;background:#fff;color:var(--navy);font-weight:800;font-size:22px;padding:14px 22px}
+
+/* ===== OVERLAYS ===== */
+.ov{position:absolute;left:0;top:0;width:1600px;height:900px;z-index:60;display:none;align-items:center;justify-content:center;flex-direction:column;gap:20px;background:rgba(6,23,45,.62)}
+.ov.show{display:flex}
+#cdNum{font-size:260px;font-weight:800;color:#fff;text-shadow:0 12px 0 rgba(0,0,0,.3);line-height:1}
+#cdNum.go{animation:pop .7s cubic-bezier(.3,1.6,.5,1)}
+#pauseOv h2{font-size:80px;color:#fff}
+#keyOv .box{width:1300px;height:760px;background:#fff;border-radius:30px;padding:30px 36px;display:flex;flex-direction:column}
+#keyOv h3{font-size:32px;color:var(--navy);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+#keyList{flex:1;overflow-y:auto;touch-action:pan-y;padding-right:8px}
+.krow{display:flex;gap:16px;padding:12px 6px;border-bottom:2px dashed #dbe7f3;font-size:19px;line-height:1.4}
+.krow .kn{flex:none;width:44px;height:44px;border-radius:12px;background:var(--navy);color:#fff;font-weight:800;display:grid;place-items:center}
+.krow .kq{flex:1}
+.krow .ka{color:var(--green);font-weight:700}
+.krow .kw{flex:none;width:200px;text-align:right;font-weight:700}
+
+/* ===== END ===== */
+#end{padding:96px 54px 20px;text-align:center}
+#end h1{font-size:54px;color:var(--navy);font-weight:800;animation:rise .6s both}
+#winner{font-size:32px;font-weight:800;color:var(--orange);margin:6px 0 10px;animation:rise .6s both .15s}
+#podium{display:flex;justify-content:center;align-items:flex-end;gap:30px;height:430px;margin-bottom:40px}
+.pcol{width:250px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.pcol .md{font-size:64px;line-height:1;animation:pop .6s cubic-bezier(.3,1.6,.5,1) both}
+.pcol .nm{font-size:23px;font-weight:800;color:var(--navy);margin:6px 0}
+.pcol .bar{width:100%;border-radius:24px 24px 10px 10px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.15) 0 16px,transparent 16px 32px),var(--g);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:14px;font-size:64px;font-weight:800;line-height:1;transform-origin:bottom;animation:grow 1s cubic-bezier(.3,1.3,.5,1) both;box-shadow:0 8px 0 rgba(0,0,0,.18)}
+.pcol .bar small{font-size:18px;font-weight:600;opacity:.9;margin-top:6px}
+@keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.endBtns{display:flex;gap:16px;justify-content:center}
+
+#fx{position:absolute;left:0;top:0;width:1600px;height:900px;pointer-events:none;z-index:90;overflow:hidden}
+.cf{position:absolute;top:-30px;width:14px;height:22px;border-radius:3px;animation:fall linear forwards}
+@keyframes fall{to{transform:translate(var(--x),980px) rotate(var(--r))}}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- TOP BAR -->
+  <nav id="top">
+    <a class="tb" href="index.html" id="bHome" title="Kembali ke materi"><span class="e">🏠</span> Materi</a>
+    <div id="ttl">⚔️ Asesmen Battle<small id="ttlSub">IPS Kelas IX • Dwi Rosnita, S.Pd., Gr.</small></div>
+    <button class="tb gameOnly" id="bPause" onclick="togglePause()"><span class="e">⏸</span> Jeda</button>
+    <button class="tb gameOnly" onclick="skipQ()"><span class="e">⏭</span> Lewati</button>
+    <button class="tb gameOnly warn" onclick="if(confirm('Akhiri asesmen sekarang dan lihat hasil?'))endGame()"><span class="e">⏹</span> Selesai</button>
+    <button class="tb on" id="bSnd" onclick="toggleSound()"><span class="e">🔔</span></button>
+    <button class="tb" onclick="toggleFS()"><span class="e">⛶</span></button>
+  </nav>
+
+  <!-- SETUP -->
+  <section class="screen show" id="setup">
+    <div class="sethead">
+      <div class="ic">⚔️</div>
+      <div><h1>Asesmen Battle</h1><p>Adaptasi &amp; Mitigasi Bencana terhadap Perubahan Iklim • IPS Kelas IX (Fase D)</p></div>
+    </div>
+    <div class="setgrid">
+      <div class="card setc">
+        <h3>⚙️ Pengaturan Asesmen</h3>
+        <div class="row"><label>📝 Jumlah soal</label>
+          <div class="seg" data-k="n"><button data-v="10">10</button><button data-v="15">15</button><button data-v="20">20</button><button data-v="30">30</button></div></div>
+        <div class="row"><label>⏱️ Waktu per soal</label>
+          <div class="seg" data-k="t"><button data-v="10">10<small>detik</small></button><button data-v="15">15<small>detik</small></button><button data-v="30">30<small>detik</small></button></div></div>
+        <div class="row"><label>⚔️ VS Battle (jumlah kelompok)</label>
+          <div class="seg" data-k="g"><button data-v="2">2<small>kelompok</small></button><button data-v="3">3<small>kelompok</small></button><button data-v="4">4<small>kelompok</small></button></div></div>
+        <div id="summary"></div>
+      </div>
+      <div class="card howc">
+        <h3>🎮 Cara Bermain</h3>
+        <ol>
+          <li><span>Soal muncul di bagian atas layar.</span></li>
+          <li><span>Opsi jawaban A, B, C, D berputar-putar di tengah layar.</span></li>
+          <li><span>Perwakilan kelompok menarik jawaban ke <b>keranjang kelompoknya</b>.</span></li>
+          <li><span><b>Benar</b> → angka di keranjang bertambah. Kelompok tercepat yang dapat poin!</span></li>
+          <li><span><b>Salah</b> → keranjang <b>tertutup</b> 🔒 dan terbuka lagi di soal berikutnya.</span></li>
+        </ol>
+        <div id="prevBk"></div>
+      </div>
+    </div>
+    <div class="startRow"><button class="btn" id="btnStart" onclick="startGame()">▶ Mulai Asesmen</button></div>
+  </section>
+
+  <!-- GAME -->
+  <section class="screen" id="game">
+    <div class="card" id="qbox">
+      <div id="qno">1<small>dari 10</small></div>
+      <div id="qtext"></div>
+      <div id="timer">
+        <svg viewBox="0 0 112 112"><circle cx="56" cy="56" r="46" fill="none" stroke="#e3edf7" stroke-width="12"/><circle id="tring" cx="56" cy="56" r="46" fill="none" stroke="#2f9e44" stroke-width="12" stroke-linecap="round" stroke-dasharray="289" stroke-dashoffset="0"/></svg>
+        <div id="tnum">15</div>
+      </div>
+    </div>
+    <div id="orbit"></div>
+    <div id="hint">✋ Tarik jawaban ke keranjang kelompokmu!</div>
+    <div id="arena"></div>
+    <div id="baskets"></div>
+    <div id="banner"><div class="be" id="bnE">🎉</div><div class="bt"><b id="bnT"></b><span id="bnS"></span></div><button onclick="nextQ()">Lanjut ▶</button></div>
+  </section>
+
+  <!-- END -->
+  <section class="screen" id="end">
+    <h1>🏆 Hasil Asesmen Battle</h1>
+    <div id="winner"></div>
+    <div id="podium"></div>
+    <div class="endBtns">
+      <button class="btn" style="background:var(--orange)" onclick="startGame()">🔄 Main Lagi</button>
+      <button class="btn" style="background:var(--teal)" onclick="showKey(true)">🔑 Kunci Jawaban</button>
+      <button class="btn" style="background:var(--navy2)" onclick="toSetup()">⚙️ Pengaturan</button>
+      <a class="btn" style="background:#5f3dc4" href="index.html">📘 Kembali ke Materi</a>
+    </div>
+  </section>
+
+  <!-- OVERLAYS -->
+  <div class="ov" id="cdOv"><div id="cdNum">3</div></div>
+  <div class="ov" id="pauseOv"><h2>⏸ Dijeda</h2><button class="btn" style="background:var(--orange);font-size:30px" onclick="togglePause()">▶ Lanjutkan</button></div>
+  <div class="ov" id="keyOv" onclick="if(event.target===this)showKey(false)">
+    <div class="box"><h3>🔑 Kunci Jawaban &amp; Rekap<button class="btn" style="background:var(--navy);font-size:20px;padding:10px 20px" onclick="showKey(false)">✕ Tutup</button></h3><div id="keyList"></div></div>
+  </div>
+  <div id="fx"></div>
+</div>
+
+<script>
+/* =========================================================
+   BANK SOAL (30 soal) — opsi pertama selalu kunci jawaban,
+   urutan opsi diacak saat permainan.
+   ========================================================= */
+const QB=[
+ {q:'Perubahan pola suhu dan cuaca dalam jangka panjang disebut …',o:['Perubahan iklim','Cuaca ekstrem','Musim pancaroba','Pergantian musim']},
+ {q:'Penyebab utama perubahan iklim dari aktivitas manusia adalah …',o:['Emisi gas rumah kaca','Gempa bumi','Pasang surut air laut','Rotasi bumi']},
+ {q:'Gas rumah kaca yang paling banyak dihasilkan dari pembakaran bahan bakar fosil adalah …',o:['Karbon dioksida (CO₂)','Oksigen (O₂)','Nitrogen (N₂)','Helium (He)']},
+ {q:'Berikut ini yang BUKAN termasuk bencana terkait iklim adalah …',o:['Gempa bumi','Banjir','Kekeringan','Kebakaran hutan']},
+ {q:'Bencana yang dipicu oleh faktor cuaca dan iklim disebut bencana …',o:['Hidrometeorologi','Geologi','Biologi','Kegagalan teknologi']},
+ {q:'Upaya menyesuaikan diri terhadap dampak perubahan iklim disebut …',o:['Adaptasi','Mitigasi','Evakuasi','Rehabilitasi']},
+ {q:'Upaya mengurangi emisi gas rumah kaca atau meningkatkan penyerapan karbon disebut …',o:['Mitigasi','Adaptasi','Evakuasi','Rekonstruksi']},
+ {q:'Kata kunci yang tepat untuk ADAPTASI adalah …',o:['Menyesuaikan diri dengan dampak','Mengurangi penyebab','Menambah emisi','Memindahkan bencana']},
+ {q:'Manakah yang termasuk contoh ADAPTASI?',o:['Membuat sumur resapan','Memasang panel surya','Bersepeda ke sekolah','Menghemat listrik']},
+ {q:'Manakah yang termasuk contoh MITIGASI?',o:['Memakai energi terbarukan','Menyiapkan jalur evakuasi','Membangun rumah panggung','Memasang sirene bahaya']},
+ {q:'Dalam analogi keran bocor, “menutup keran yang bocor” menggambarkan …',o:['Mitigasi','Adaptasi','Evakuasi','Rehabilitasi']},
+ {q:'Tiga komponen yang membentuk risiko bencana adalah …',o:['Bahaya, paparan, kerentanan','Hujan, angin, petir','Banjir, longsor, kekeringan','Desa, kota, provinsi']},
+ {q:'Jumlah penduduk dan aset yang berada di wilayah bahaya disebut …',o:['Paparan','Kerentanan','Kapasitas','Bahaya']},
+ {q:'Kondisi sosial-ekonomi dan infrastruktur buruk yang membuat warga mudah terdampak disebut …',o:['Kerentanan','Paparan','Kapasitas','Ketahanan']},
+ {q:'Kemampuan masyarakat untuk bersiap, menghadapi, dan pulih dari bencana disebut …',o:['Kapasitas','Kerentanan','Paparan','Bahaya']},
+ {q:'Jika kapasitas masyarakat meningkat, maka risiko bencana akan …',o:['Menurun','Meningkat','Tetap sama','Berlipat ganda']},
+ {q:'Menanam mangrove di pesisir bermanfaat untuk …',o:['Menahan abrasi dan gelombang','Menambah emisi karbon','Memperluas tempat sampah','Mempercepat banjir rob']},
+ {q:'Fungsi utama sistem peringatan dini adalah …',o:['Memberi tanda bahaya lebih awal','Menghentikan hujan deras','Mencegah gempa bumi','Menaikkan suhu udara']},
+ {q:'Kepanjangan 3R dalam pengelolaan sampah adalah …',o:['Reduce, Reuse, Recycle','Reduce, Repair, Rebuild','Reuse, Replace, Remove','Recycle, Return, Repeat']},
+ {q:'Sampah yang menumpuk di TPA dapat menghasilkan gas rumah kaca berupa …',o:['Metana','Oksigen','Helium','Hidrogen']},
+ {q:'Program Kampung Iklim (ProKlim) merupakan contoh upaya tingkat …',o:['Lokal','Regional','Global','Antarnegara']},
+ {q:'Tujuan program Desa/Kampung Tangguh Bencana adalah …',o:['Warga siap menghadapi bencana','Memperluas lahan pabrik','Menambah jumlah kendaraan','Menghapus musim hujan']},
+ {q:'Cakupan strategi tingkat REGIONAL adalah …',o:['Provinsi, antardaerah, kawasan','Desa, kelurahan, kota','Antarnegara dan dunia','Keluarga dan sekolah']},
+ {q:'Pengelolaan DAS yang melintasi beberapa kabupaten termasuk strategi tingkat …',o:['Regional','Lokal','Global','Keluarga']},
+ {q:'Melindungi hutan dan lahan gambut termasuk mitigasi karena keduanya …',o:['Menyimpan karbon dalam jumlah besar','Membuat suhu makin panas','Mudah dijadikan permukiman','Menghasilkan batu bara']},
+ {q:'Contoh tata ruang berbasis risiko iklim adalah …',o:['Tidak membangun rumah di bantaran sungai','Membangun rumah di bantaran sungai','Menebang hutan di daerah hulu','Menutup saluran drainase']},
+ {q:'Persetujuan Paris (Paris Agreement) tahun 2015 bertujuan …',o:['Menahan kenaikan suhu global','Menghapus musim kemarau','Memperbanyak tambang batu bara','Membangun pabrik baru']},
+ {q:'Konferensi iklim PBB yang diadakan setiap tahun disebut …',o:['COP (Conference of the Parties)','SEA Games','Piala Dunia','Asian Games']},
+ {q:'Green Climate Fund (Dana Iklim Hijau) adalah contoh adaptasi global berupa …',o:['Pendanaan bagi negara rentan','Transportasi umum kota','Bank sampah di RW','Jalur evakuasi desa']},
+ {q:'Semboyan “Berpikir global, bertindak lokal” berarti …',o:['Aksi kecil di sekitar kita ikut membantu dunia','Hanya negara maju yang harus bertindak','Masalah iklim bukan urusan pelajar','Aksi lokal tidak ada pengaruhnya']}
+];
+
+const GROUPS=[
+ {c:'#e03131',d:'#9b1c1c',n:'Kelompok 1'},{c:'#1971c2',d:'#0d4a85',n:'Kelompok 2'},
+ {c:'#2f9e44',d:'#1b6b2c',n:'Kelompok 3'},{c:'#f08c00',d:'#a35f00',n:'Kelompok 4'}
+];
+const OPTC=['#7048e8','#0c8599','#d6336c','#e67700'];
+
+/* =========================================================
+   UTIL, SKALA, SUARA
+   ========================================================= */
+const $=s=>document.querySelector(s);
+const R=n=>[...Array(n).keys()];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const stage=$('#stage');let S=1;
+function fit(){S=Math.min(innerWidth/1600,innerHeight/900);stage.style.transform=`translate(-50%,-50%) scale(${S})`;}
+function toStage(cx,cy){const r=stage.getBoundingClientRect();return{x:(cx-r.left)/S,y:(cy-r.top)/S};}
+
+let AC=null,soundOn=true;
+function tone(f,d=.12,type='sine',vol=.15,delay=0){
+  if(!soundOn)return;
+  try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();
+    const t=AC.currentTime+delay,o=AC.createOscillator(),g=AC.createGain();
+    o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+d);
+    o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.02);}catch(e){}
+}
+const sfx={
+  click:()=>tone(700,.05,'triangle',.07),
+  pick:()=>tone(560,.06,'triangle',.08),
+  tick:()=>tone(1000,.07,'square',.05),
+  ok:()=>{tone(660,.12,'sine',.16);tone(990,.22,'sine',.16,.1)},
+  no:()=>{tone(220,.25,'sawtooth',.08);tone(150,.3,'square',.05,.12)},
+  go:()=>tone(880,.35,'triangle',.14),
+  time:()=>{tone(400,.2,'triangle',.1);tone(300,.35,'triangle',.1,.18)},
+  win:()=>[523,659,784,1047,1319].forEach((f,i)=>tone(f,.25,'triangle',.13,i*.13))
+};
+function toggleSound(){soundOn=!soundOn;const b=$('#bSnd');b.classList.toggle('on',soundOn);b.querySelector('.e').textContent=soundOn?'🔔':'🔕';}
+function toggleFS(){
+  const d=document;
+  if(!d.fullscreenElement&&!d.webkitFullscreenElement){(d.documentElement.requestFullscreen||d.documentElement.webkitRequestFullscreen).call(d.documentElement);}
+  else{(d.exitFullscreen||d.webkitExitFullscreen).call(d);}
+}
+function confetti(n=160){
+  const box=$('#fx'),cols=['#f08c00','#2f9e44','#1971c2','#e03131','#fcc419','#0e9f9a'];
+  for(let i=0;i<n;i++){
+    const c=document.createElement('i');c.className='cf';
+    c.style.left=(Math.random()*1600)+'px';c.style.background=cols[i%cols.length];
+    c.style.animationDuration=(2.2+Math.random()*2)+'s';c.style.animationDelay=(Math.random()*.8)+'s';
+    c.style.setProperty('--r',(Math.random()*900-450)+'deg');c.style.setProperty('--x',(Math.random()*240-120)+'px');
+    box.appendChild(c);setTimeout(()=>c.remove(),5400);
+  }
+}
+
+/* =========================================================
+   PENGATURAN
+   ========================================================= */
+let cfg={n:10,t:15,g:2};
+try{const s=JSON.parse(localStorage.getItem('asesmenCfg')||'null');if(s&&[10,15,20,30].includes(s.n)&&[10,15,30].includes(s.t)&&[2,3,4].includes(s.g))cfg=s;}catch(e){}
+function renderSetup(){
+  document.querySelectorAll('.seg').forEach(seg=>seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset.v===cfg[seg.dataset.k])));
+  const tot=cfg.n*cfg.t,m=Math.floor(tot/60),s=tot%60;
+  $('#summary').textContent=`📋 ${cfg.n} soal × ${cfg.t} detik • ${cfg.g} kelompok bertanding • waktu maksimal ± ${m} menit${s?` ${s} detik`:''}`;
+  $('#prevBk').innerHTML=R(cfg.g).map(i=>`<span style="--g:${GROUPS[i].c};animation-delay:${i*.08}s"><b>🧺</b>${GROUPS[i].n}</span>`).join('');
+}
+document.querySelectorAll('.seg').forEach(seg=>seg.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  cfg[seg.dataset.k]=+b.dataset.v;sfx.click();renderSetup();
+  try{localStorage.setItem('asesmenCfg',JSON.stringify(cfg));}catch(_){}
+}));
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('show',s.id===id));}
+function toSetup(){state='setup';document.body.classList.remove('playing');show('setup');renderSetup();}
+
+/* =========================================================
+   PERMAINAN
+   ========================================================= */
+const CX=800,CY=440,RX=470,RY=125,OW=360,OH=110;
+let state='setup',paused=false,qs=[],qi=0,scores=[],closed=[],opts=[],remain=0,revealLeft=0,rot=0,log=[],lastSec=0;
+
+function startGame(){
+  qs=shuffle(QB).slice(0,cfg.n);qi=0;log=[];scores=R(cfg.g).map(()=>0);paused=false;
+  $('#keyOv').classList.remove('show');$('#pauseOv').classList.remove('show');
+  document.body.classList.add('playing');
+  buildBaskets();show('game');clearOpts();
+  $('#qtext').textContent='Bersiap…';$('#qno').innerHTML=`1<small>dari ${qs.length}</small>`;
+  state='count';countdown(()=>loadQ(0));
+}
+function countdown(done){
+  const ov=$('#cdOv'),n=$('#cdNum');ov.classList.add('show');let k=3;
+  const step=()=>{
+    n.textContent=k>0?k:'Mulai!';n.style.fontSize=k>0?'260px':'150px';
+    n.classList.remove('go');void n.offsetWidth;n.classList.add('go');
+    k>0?sfx.tick():sfx.go();
+    if(k-->0)setTimeout(step,800);else setTimeout(()=>{ov.classList.remove('show');done();},700);
+  };step();
+}
+function buildBaskets(){
+  const bw={2:390,3:350,4:320}[cfg.g];
+  $('#baskets').innerHTML=R(cfg.g).map(i=>{const G=GROUPS[i];return `
+   <div class="basket" data-i="${i}" style="--g:${G.c};--gd:${G.d};width:${bw}px">
+     <div class="bk-body"><div class="bk-score">0</div><div class="bk-name">🧺 ${G.n}</div></div>
+     <div class="bk-mouth"></div>
+     <div class="lid"><i></i></div>
+     <div class="lock">🔒 Tertutup</div>
+     <div class="plus">+1</div>
+   </div>`}).join('');
+}
+const basketEls=()=>[...document.querySelectorAll('.basket')];
+
+function loadQ(i){
+  qi=i;state='play';remain=cfg.t*1000;lastSec=cfg.t;
+  closed=R(cfg.g).map(()=>false);
+  basketEls().forEach(b=>b.classList.remove('closed','over','got'));
+  $('#banner').classList.remove('show');
+  const Q=qs[qi];
+  $('#qno').innerHTML=`${qi+1}<small>dari ${qs.length}</small>`;
+  const qt=$('#qtext');qt.textContent=Q.q;qt.classList.remove('in');void qt.offsetWidth;qt.classList.add('in');
+  $('#ttlSub').textContent=`Soal ${qi+1} dari ${qs.length}`;
+  clearOpts();
+  const order=shuffle([0,1,2,3]);
+  opts=order.map((src,k)=>{
+    const el=document.createElement('div');el.className='opt';
+    el.style.setProperty('--oc',OPTC[k]);
+    el.innerHTML=`<div class="oc" style="animation-delay:${k*.08}s"><span class="L">${'ABCD'[k]}</span><span>${Q.o[src]}</span></div>`;
+    $('#arena').appendChild(el);
+    const o={el,k,letter:'ABCD'[k],text:Q.o[src],correct:src===0,a0:k*Math.PI/2,x:CX,y:CY,ret:1,drag:null,fly:null,hover:-1};
+    bindDrag(o);return o;
+  });
+  drawTimer();
+}
+function clearOpts(){opts.forEach(o=>o.el.remove());opts=[];}
+
+/* ---- tarik & lepas (mendukung banyak sentuhan sekaligus) ---- */
+function basketAt(cx,cy){
+  const els=basketEls(),pad=70*S;
+  for(let i=0;i<els.length;i++){const r=els[i].getBoundingClientRect();
+    if(cx>=r.left-10*S&&cx<=r.right+10*S&&cy>=r.top-pad&&cy<=r.bottom)return i;}
+  return -1;
+}
+function refreshHover(){basketEls().forEach((b,i)=>b.classList.toggle('over',opts.some(o=>o.drag&&o.hover===i)));}
+function bindDrag(o){
+  const el=o.el;
+  el.addEventListener('pointerdown',e=>{
+    if(state!=='play'||paused||o.drag)return;
+    e.preventDefault();
+    try{el.setPointerCapture(e.pointerId);}catch(_){}
+    const p=toStage(e.clientX,e.clientY);
+    o.drag={id:e.pointerId,dx:p.x-o.x,dy:p.y-o.y};o.ret=0;
+    el.classList.add('drag');sfx.pick();
+  });
+  el.addEventListener('pointermove',e=>{
+    if(!o.drag||e.pointerId!==o.drag.id)return;
+    const p=toStage(e.clientX,e.clientY);
+    o.x=Math.max(OW/2,Math.min(1600-OW/2,p.x-o.drag.dx));
+    o.y=Math.max(OH/2+80,Math.min(900-OH/2,p.y-o.drag.dy));
+    o.hover=basketAt(e.clientX,e.clientY);refreshHover();
+  });
+  const end=e=>{
+    if(!o.drag||e.pointerId!==o.drag.id)return;
+    o.drag=null;el.classList.remove('drag');
+    const b=e.type==='pointerup'?basketAt(e.clientX,e.clientY):-1;
+    o.hover=-1;refreshHover();
+    if(b>=0&&state==='play')drop(o,b);else o.ret=1;
+  };
+  el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);
+}
+function drop(o,bi){
+  const bk=basketEls()[bi];
+  if(closed[bi]){ // keranjang tertutup: jawaban dipantulkan
+    o.ret=1;bk.classList.remove('shake');void bk.offsetWidth;bk.classList.add('shake');sfx.no();return;
+  }
+  if(o.correct){
+    scores[bi]++;
+    const sc=bk.querySelector('.bk-score');sc.textContent=scores[bi];sc.classList.remove('bump');void sc.offsetWidth;sc.classList.add('bump');
+    bk.classList.remove('got');void bk.offsetWidth;bk.classList.add('got');
+    const m=bk.querySelector('.bk-mouth').getBoundingClientRect(),p=toStage(m.left+m.width/2,m.top+m.height/2);
+    o.fly={x:p.x,y:p.y};o.el.classList.add('into');
+    sfx.ok();confetti(60);
+    reveal(bi,'win',o);
+  }else{
+    closed[bi]=true;bk.classList.add('closed');
+    o.ret=1;o.el.classList.remove('bad');void o.el.offsetWidth;o.el.classList.add('bad');
+    setTimeout(()=>o.el.classList.remove('bad'),600);
+    sfx.no();
+    if(closed.every(Boolean))reveal(-1,'allclosed');
+  }
+}
+
+/* ---- hasil tiap soal ---- */
+function reveal(bi,why,winOpt){
+  if(state!=='play')return;
+  state='reveal';revealLeft=why==='win'?3200:4200;
+  const c=opts.find(o=>o.correct);
+  opts.forEach(o=>{if(o.drag){o.drag=null;o.el.classList.remove('drag');o.ret=1;}
+    if(o!==winOpt)o.el.classList.add(o.correct?'right':'dim');});
+  refreshHover();
+  log.push({q:qs[qi].q,a:`${c.letter}. ${c.text}`,w:bi});
+  const B=$('#banner');
+  if(why==='win'){
+    B.style.background=`linear-gradient(90deg,${GROUPS[bi].c},${GROUPS[bi].d})`;
+    $('#bnE').textContent='🎉';$('#bnT').textContent=`${GROUPS[bi].n} benar! +1 poin`;
+  }else{
+    B.style.background='linear-gradient(90deg,#13315c,#0b2545)';
+    $('#bnE').textContent=why==='time'?'⏰':why==='skip'?'⏭':'🔒';
+    $('#bnT').textContent=why==='time'?'Waktu habis!':why==='skip'?'Soal dilewati':'Semua keranjang tertutup!';
+    if(why==='time')sfx.time();
+  }
+  $('#bnS').textContent=`Jawaban benar: ${c.letter}. ${c.text}`;
+  B.classList.add('show');
+}
+function nextQ(){
+  if(state!=='reveal')return;
+  sfx.click();
+  if(qi+1<qs.length)loadQ(qi+1);else endGame();
+}
+function skipQ(){if(state==='play'&&!paused)reveal(-1,'skip');}
+function togglePause(){
+  if(state!=='play'&&state!=='reveal')return;
+  paused=!paused;$('#pauseOv').classList.toggle('show',paused);
+  $('#bPause').innerHTML=paused?'<span class="e">▶</span> Lanjut':'<span class="e">⏸</span> Jeda';
+  if(paused)opts.forEach(o=>{if(o.drag){o.drag=null;o.el.classList.remove('drag');o.ret=1;}});
+  refreshHover();
+}
+
+/* ---- timer ---- */
+function drawTimer(){
+  const f=Math.max(0,remain/(cfg.t*1000)),sec=Math.ceil(remain/1000);
+  const ring=$('#tring');ring.style.strokeDashoffset=289*(1-f);
+  ring.style.stroke=f>.5?'#2f9e44':f>.25?'#f08c00':'#e03131';
+  $('#tnum').textContent=sec;
+  $('#timer').classList.toggle('hurry',sec<=5&&state==='play');
+}
+
+/* ---- loop animasi: opsi berputar mengelilingi arena ---- */
+let last=performance.now();
+function loop(now){
+  const raw=Math.min(1000,now-last),dt=Math.min(50,raw);last=now; // raw: waktu nyata untuk timer
+  if(!paused&&(state==='play'||state==='reveal')){
+    rot+=dt*(state==='play'?.00026:.00008);
+    if(state==='play'){
+      remain-=raw;const sec=Math.ceil(remain/1000);
+      if(sec!==lastSec){lastSec=sec;if(sec<=3&&sec>0)sfx.tick();}
+      if(remain<=0){remain=0;reveal(-1,'time');}
+      drawTimer();
+    }else{revealLeft-=raw;if(revealLeft<=0)nextQ();}
+  }
+  const k=Math.min(1,dt*.012);
+  opts.forEach(o=>{
+    if(!o.drag){
+      let tx,ty;
+      if(o.fly){tx=o.fly.x;ty=o.fly.y;}
+      else{const a=rot+o.a0;tx=CX+RX*Math.cos(a);ty=CY+RY*Math.sin(a)+Math.sin(now/700+o.k*1.7)*10;}
+      if(o.ret||o.fly){o.x+=(tx-o.x)*k;o.y+=(ty-o.y)*k;if(!o.fly&&Math.hypot(tx-o.x,ty-o.y)<3)o.ret=0;}
+      else{o.x=tx;o.y=ty;}
+    }
+    const tilt=o.drag?0:Math.sin(now/900+o.k)*4;
+    o.el.style.transform=`translate(${o.x-OW/2}px,${o.y-OH/2}px) rotate(${tilt}deg)`;
+  });
+  requestAnimationFrame(loop);
+}
+
+/* =========================================================
+   HASIL AKHIR
+   ========================================================= */
+function endGame(){
+  if(state==='play'||state==='reveal'){/* soal yang sedang berjalan tidak dihitung */}
+  state='end';paused=false;$('#pauseOv').classList.remove('show');
+  $('#bPause').innerHTML='<span class="e">⏸</span> Jeda';
+  clearOpts();document.body.classList.remove('playing');$('#ttlSub').textContent='Hasil akhir';
+  show('end');
+  const top=Math.max(...scores),played=log.length;
+  const winners=R(cfg.g).filter(i=>scores[i]===top);
+  $('#winner').textContent=top===0?'Belum ada poin — ayo coba lagi! 💪':
+    winners.length>1?`🤝 Seri! ${winners.map(i=>GROUPS[i].n).join(' & ')} sama kuat`:`🎉 Juara: ${GROUPS[winners[0]].n}!`;
+  const medals=['🥇','🥈','🥉','🎖️'];
+  const cols=R(cfg.g).map(i=>({i,s:scores[i],rank:1+scores.filter(x=>x>scores[i]).length}));
+  $('#podium').innerHTML=cols.map((c,j)=>{
+    const h=120+200*(top?c.s/top:0);
+    return `<div class="pcol"><div class="md" style="animation-delay:${.6+j*.1}s">${medals[c.rank-1]}</div><div class="nm">${GROUPS[c.i].n}</div>
+      <div class="bar" style="--g:${GROUPS[c.i].c};height:${h}px;animation-delay:${j*.12}s">${c.s}<small>dari ${played} soal</small></div></div>`;
+  }).join('');
+  $('#keyList').innerHTML=log.length?log.map((l,i)=>`<div class="krow"><span class="kn">${i+1}</span><div class="kq">${l.q}<br><span class="ka">✔ ${l.a}</span></div><div class="kw" style="color:${l.w>=0?GROUPS[l.w].c:'#868e96'}">${l.w>=0?'🏅 '+GROUPS[l.w].n:'— tidak ada'}</div></div>`).join(''):'<p style="font-size:22px;color:var(--muted)">Belum ada soal yang dimainkan.</p>';
+  if(top>0){sfx.win();confetti(200);}
+}
+function showKey(on){$('#keyOv').classList.toggle('show',on);if(on)sfx.click();}
+
+/* =========================================================
+   INPUT & INISIALISASI
+   ========================================================= */
+document.addEventListener('keydown',e=>{
+  if(e.key===' '){e.preventDefault();togglePause();}
+  else if(e.key==='Enter'||e.key==='ArrowRight'){nextQ();}
+  else if(e.key==='Escape'){showKey(false);}
+  else if(e.key==='f'||e.key==='F')toggleFS();
+});
+$('#bHome').addEventListener('click',e=>{
+  if((state==='play'||state==='reveal')&&!confirm('Asesmen sedang berjalan. Kembali ke materi?'))e.preventDefault();
+});
+window.addEventListener('resize',fit);document.addEventListener('fullscreenchange',fit);
+fit();renderSetup();requestAnimationFrame(loop);
+</script>
+</body>
+</html>
